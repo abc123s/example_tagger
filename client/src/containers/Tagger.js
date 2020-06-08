@@ -180,9 +180,6 @@ class Tagger extends Component {
       );
     }
 
-    console.log('here');
-    console.log(tags);
-
     const tokenBox = index => (
       <div key={index} className="flexVerticalCenter top20 left10">
         <div className="centered">{tokens[index]}</div>
@@ -240,7 +237,9 @@ class Tagger extends Component {
             <Container className="app">
               {message}
               <div className="left10">
-                Original Text: {this.state.trainingExample.original}
+                Original Text: {trainingExample.original} <br />
+                Source:{' '}
+                <a href={trainingExample.source}>{trainingExample.source}</a>
               </div>
               <div className="flexStartCenter flexWrap">
                 {_.map(this.state.trainingExample.tokens, (token, index) =>
