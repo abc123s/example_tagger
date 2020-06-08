@@ -18,8 +18,19 @@ import { KIND } from '../utils/Constants';
 const examples = [
   {
     title: 'Basic Example',
-    note:
-      'There are 5 tags, QTY, UNIT, NAME (ingredient), COMMENT (prep) and OTHER. The first four tags have two variants: B-[TAG], indicating the beginning of the tagged phrase, and I-[TAG], indicating the interior of the tagged phrase.',
+    note: (
+      <span>
+        There are 5 tags, QTY, UNIT, NAME (ingredient), COMMENT (prep) and
+        OTHER. The first four tags have two variants: B-[TAG], indicating the
+        beginning of the tagged phrase, and I-[TAG], indicating the interior of
+        the tagged phrase.
+        <br />
+        <span className="bold">
+          *WARNING: A FAIR NUMBER OF THE PRE-COMPUTED TAGS USE AN I-[TAG]
+          INSTEAD OF A B-[TAG] TO START A PHRASE - MAKE SURE TO FIX THESE.*
+        </span>
+      </span>
+    ),
     original: '1 15.5 oz can black beans, rinsed and drained',
     tokens: [
       '1',
@@ -197,6 +208,13 @@ const examples = [
       'I-COMMENT',
       'I-COMMENT',
     ],
+  },
+  {
+    title: 'What is OTHER?',
+    note:
+      'Aside from punctuation, one of the other types of OTHER tags are for filler or unnecessary words (e.g. head *of*, bunch *of*, where the of is not needed).',
+    tokens: ['1', 'bunch', 'of', 'mint', 'leaves'],
+    tags: ['B-QTY', 'B-UNIT', 'OTHER', 'B-NAME', 'I-NAME'],
   },
 ];
 
