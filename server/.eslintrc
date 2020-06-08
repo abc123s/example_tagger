@@ -1,0 +1,24 @@
+{
+  "extends": ["airbnb", "plugin:prettier/recommended"],
+  "env": {
+    "browser": false,
+    "node": true,
+    "mocha": false
+  },
+  "plugins": ["prettier"],
+  "parserOptions": {
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "experimentalObjectRestSpread": true
+    }
+  },
+  "rules": {
+    "prettier/prettier": "error",
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": true
+      }
+    ]
+  }
+}

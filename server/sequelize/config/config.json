@@ -1,0 +1,15 @@
+{
+  "development": {
+    "use_env_variable": "LOCAL_DATABASE_URL",
+    "logging": false
+  },
+  "production": {
+    "use_env_variable": "DATABASE_URL",
+    "logging": false
+  },
+  "local_production": {
+    "use_env_variable": "DATABASE_URL",
+    "logging": false,
+    "dialectOptions": { "ssl": true }
+  }
+}

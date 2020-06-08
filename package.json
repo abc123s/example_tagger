@@ -1,0 +1,27 @@
+{
+  "name": "example_tagger",
+  "version": "0.0.1",
+  "private": true,
+  "engines": {
+    "node": "12.14.1"
+  },
+  "scripts": {
+    "install": "(cd client && yarn install) && (cd server && yarn install)",
+    "install:dev": "(cd client && yarn install) && (cd server && yarn install) && pip install -r requirements.txt",
+    "start": "concurrently \"cd client && PORT=4500 yarn start\" \"cd server && PORT=4501 yarn start\"",
+    "build": "concurrently \"cd client && yarn run build\" \"cd server && yarn run build\"",
+    "start:prod": "cd server && yarn run start:prod",
+    "heroku-postbuild": "yarn run build",
+    "time": "./timecheck.sh 2>/dev/null",
+    "clean": "rm -r client/node_modules && rm -r server/node_modules",
+    "migrate": "cd server && node_modules/.bin/sequelize db:migrate"
+  },
+  "pre-commit": "time",
+  "dependencies": {
+    "babel-register": "^6.26.0",
+    "concurrently": "^3.5.0"
+  },
+  "devDependencies": {
+    "pre-commit": "^1.2.2"
+  }
+}

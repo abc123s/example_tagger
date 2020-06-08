@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="890px" height="594px" viewBox="0 0 890 594" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="Symbols" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="App-Icon" transform="translate(-323.000000, -471.000000)">
+            <g id="Dots" transform="translate(323.000000, 471.000000)">
+                <circle id="Oval" fill="#e36776" cx="296.666667" cy="296.666667" r="296.666667"></circle>
+                <circle id="Oval" fill="#7d0110" cx="593.333333" cy="296.666667" r="296.666667"></circle>
+            </g>
+        </g>
+    </g>
+</svg>
