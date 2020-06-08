@@ -180,13 +180,77 @@ class Tagger extends Component {
       );
     }
 
+    const tagColors = {
+      [TAG.bQty]: '#F57C00',
+      [TAG.iQty]: '#FFB300',
+      [TAG.bUnit]: '#558B2F',
+      [TAG.iUnit]: '#8BC34A',
+      [TAG.bName]: '#1565C0',
+      [TAG.iName]: '#64B5F6',
+      [TAG.bComment]: '#6A1B9A',
+      [TAG.iComment]: '#BA68C8',
+      [TAG.other]: '#9E9E9E',
+    };
+
+    const orderedTags = [
+      TAG.bQty,
+      TAG.iQty,
+      TAG.bUnit,
+      TAG.iUnit,
+      TAG.bName,
+      TAG.iName,
+      TAG.bComment,
+      TAG.iComment,
+      TAG.other,
+    ];
+
+    const customStyles = {
+      option: (provided, state) => {
+        const selected = state.data.value;
+
+        return {
+          ...provided,
+          backgroundColor: tagColors[state.data.value],
+          color: selected.slice(0, 1) === 'B' ? 'white' : 'black',
+          fontWeight: 'bold',
+        };
+      },
+      singleValue: (provided, state) => {
+        const selected = state.getValue()[0].value;
+        return {
+          ...provided,
+          backgroundColor: tagColors[selected],
+          color: selected.slice(0, 1) === 'B' ? 'white' : 'black',
+          fontWeight: 'bold',
+        };
+      },
+      control: (provided, state) => {
+        const selected = state.getValue()[0].value;
+        return {
+          ...provided,
+          backgroundColor: tagColors[selected],
+          color: selected.slice(0, 1) === 'B' ? 'white' : 'black',
+          fontWeight: 'bold',
+        };
+      },
+    };
+
     const tokenBox = index => (
       <div key={index} className="flexVerticalCenter top20 left10">
-        <div className="centered">{tokens[index]}</div>
+        <div
+          className="centered"
+          style={{
+            fontWeight: 'bold',
+            color: tagColors[tags[index]],
+          }}
+        >
+          {tokens[index]}
+        </div>
         <div className="top5" style={{ width: 110 }}>
           <Select
+            styles={customStyles}
             value={{ value: tags[index], label: tags[index].slice(0, 6) }}
-            options={_.map(TAG, tag => ({
+            options={_.map(orderedTags, tag => ({
               value: tag,
               label: tag.slice(0, 6),
             }))}
@@ -259,7 +323,7 @@ class Tagger extends Component {
                   DONE
                 </Button>
                 <Button
-                  variant="warning"
+                  variant="danger"
                   className="left10"
                   onClick={() => this.escalate()}
                 >
