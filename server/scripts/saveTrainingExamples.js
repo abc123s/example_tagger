@@ -19,12 +19,23 @@ TrainingExample.findAll({
     } escalated.`
   );
 
-  const cleanTaggedExamples = _.map(taggedExamples, example =>
-    _.pick(example, ['original', 'tags'])
+  const cleanTaggedExamples = _.map(taggedExamples, example => [
+    example.original,
+    example.tags,
+  ]);
+
+  const shuffledTaggedExamples = _.shuffle(cleanTaggedExamples);
+
+  const devExamples = shuffledTaggedExamples.slice(0, 1000);
+  const trainExamples = shuffledTaggedExamples.slice(1000, 3000);
+
+  fs.writeFileSync(
+    'devManuallyTaggedTrainingExamples.json',
+    JSON.stringify(devExamples, null, 4)
   );
 
   fs.writeFileSync(
-    'taggedTrainingExamples.json',
-    JSON.stringify(cleanTaggedExamples.slice(0, 3000), null, 4)
+    'trainManualTrainingExamples.json',
+    JSON.stringify(trainExamples, null, 4)
   );
 });
