@@ -7,7 +7,14 @@ TrainingExample.findAll()
     console.log(examples.length);
     const groupedExamples = _.groupBy(
       examples,
-      ({ source, original }) => `${source}-${original}`
+      ({ source: originalSource, original }) => {
+        const source =
+          originalSource.slice(-1) === '/'
+            ? originalSource.slice(0, -1)
+            : originalSource;
+
+        return `${source}-${original}`;
+      }
     );
 
     const duplicatedExamples = _.pickBy(
