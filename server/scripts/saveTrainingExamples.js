@@ -27,15 +27,15 @@ TrainingExample.findAll({
   const shuffledTaggedExamples = _.shuffle(cleanTaggedExamples);
 
   const devExamples = shuffledTaggedExamples.slice(0, 1000);
-  const trainExamples = shuffledTaggedExamples.slice(1000, 3000);
+  const trainExamples = shuffledTaggedExamples.slice(1000);
 
   fs.writeFileSync(
-    'devManuallyTaggedTrainingExamples.json',
+    'devManuallyTaggedTrainingExamples_v3.json',
     JSON.stringify(devExamples, null, 4)
   );
 
   fs.writeFileSync(
-    'trainManualTrainingExamples.json',
+    'trainManualTrainingExamples_v3.json',
     JSON.stringify(trainExamples, null, 4)
   );
 });
