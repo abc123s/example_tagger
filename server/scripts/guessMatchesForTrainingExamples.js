@@ -57,14 +57,26 @@ TrainingExample.findAll()
       taggedExample.qty = qty;
 
       const matchGuess = matchIngredients([taggedExample]);
-      updates.push(
+      updates.push(() =>
         trainingExample.update({
           matchGuess,
         })
       );
     });
 
-    return Promise.all(updates);
+    const batchedUpdates = _.chunk(updates, 50);
+
+    let serializedBatchedUpdates = Promise.resolve();
+    let batch = 0;
+    _.forEach(batchedUpdates, batchedUpdate => {
+      serializedBatchedUpdates = serializedBatchedUpdates.then(() => {
+        batch += 1;
+        console.log('Working on batch: ', batch);
+        return Promise.all(_.map(batchedUpdate, update => update()));
+      });
+    });
+
+    return serializedBatchedUpdates;
   })
   .then(() => {
     console.log('made guesses for all training examples');
