@@ -113,7 +113,7 @@ function findIngredient({ input, name: rawTaggedName, comment }) {
 function matchToVolume(unit) {
   let normalizedUnit = trim(_.toLower(unit));
   if (_.last(normalizedUnit) === 's') {
-    normalizedUnit = normalizedUnit.slice(-1);
+    normalizedUnit = normalizedUnit.slice(0, -1);
   }
 
   return (
@@ -125,7 +125,7 @@ function matchToVolume(unit) {
 function matchToWeight(unit) {
   let normalizedUnit = trim(_.toLower(unit));
   if (_.last(normalizedUnit) === 's') {
-    normalizedUnit = normalizedUnit.slice(-1);
+    normalizedUnit = normalizedUnit.slice(0, -1);
   }
 
   return (
@@ -216,22 +216,27 @@ function findIngredientUnit({
   }
 
   // handle each units
-  if (_.isNil(unit)) {
-    const eachUnits = _.filter(
-      ingredientUnits,
-      ({ type }) => type === UNIT_TYPE.each
-    );
-    const matchedEachUnit =
+  const eachUnits = _.filter(
+    ingredientUnits,
+    ({ type }) => type === UNIT_TYPE.each
+  );
+
+  // each unit that use unit words (e.g. 1 *large* egg)
+  let matchedEachUnit = _.find(eachUnits, ({ match }) =>
+    _.includes(unit, match)
+  );
+
+  // each units that do not use unit words (e.g. 1 onion)
+  if ((!matchedEachUnit && _.isNil(unit)) || unit === '') {
+    matchedEachUnit =
       _.find(eachUnits, ({ match }) => _.includes(name, match)) ||
       _.find(eachUnits, ({ rawMatch }) => _.includes(input, rawMatch)) ||
       _.find(eachUnits, ({ match }) => _.includes(comment, match)) ||
       _.find(eachUnits, ({ match }) => _.includes(other, match)) ||
       _.first(eachUnits);
+  }
 
-    if (!matchedEachUnit) {
-      return false;
-    }
-
+  if (matchedEachUnit) {
     const { id, display, annotations } = matchedEachUnit;
 
     return {
