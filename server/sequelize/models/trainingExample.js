@@ -25,6 +25,19 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: false,
     },
+    matchGuess: {
+      type: DataTypes.JSON,
+      defaultValue: null,
+    },
+    ingredients: {
+      type: DataTypes.JSON,
+      defaultValue: null,
+    },
+    matchEscalated: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    },
   });
 
   // associations can be defined here

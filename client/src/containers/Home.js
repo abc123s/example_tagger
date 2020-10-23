@@ -317,25 +317,43 @@ class Home extends Component {
     super(props);
 
     this.state = {
-      nextTrainingExample: null,
+      nextUntaggedTrainingExample: null,
+      nextUnmatchedTrainingExample: null,
     };
   }
 
   loadData() {
-    callEndpoint(
-      {
-        kind: KIND.trainingExample,
-        type: 'nextUntagged',
-        data: {
-          id: 0,
+    Promise.all([
+      callEndpoint(
+        {
+          kind: KIND.trainingExample,
+          type: 'nextUntagged',
+          data: {
+            id: 0,
+          },
         },
-      },
-      this.props.flash,
-      true
-    )
-      .then(nextUntaggedTrainingExample => {
+        this.props.flash,
+        true
+      ),
+      callEndpoint(
+        {
+          kind: KIND.trainingExample,
+          type: 'nextUnmatched',
+          data: {
+            id: 0,
+          },
+        },
+        this.props.flash,
+        true
+      ),
+    ])
+      .then(([nextUntaggedTrainingExample, nextUnmatchedTrainingExample]) => {
         this.setState({
-          nextTrainingExample: _.get(nextUntaggedTrainingExample, 'id'),
+          nextUntaggedTrainingExample: _.get(nextUntaggedTrainingExample, 'id'),
+          nextUnmatchedTrainingExample: _.get(
+            nextUnmatchedTrainingExample,
+            'id'
+          ),
         });
       })
       .catch(() => {});
@@ -360,9 +378,9 @@ class Home extends Component {
                   variant="primary"
                   className="left10 bot40"
                   onClick={() => {
-                    if (this.state.nextTrainingExample) {
+                    if (this.state.nextUntaggedTrainingExample) {
                       this.props.history.push(
-                        `/tag/${this.state.nextTrainingExample}`
+                        `/tag/${this.state.nextUntaggedTrainingExample}`
                       );
                     } else {
                       alert('All training examples tagged...');
@@ -370,6 +388,21 @@ class Home extends Component {
                   }}
                 >
                   START TAGGING
+                </Button>
+                <Button
+                  variant="success"
+                  className="left10 bot40"
+                  onClick={() => {
+                    if (this.state.nextUnmatchedTrainingExample) {
+                      this.props.history.push(
+                        `/match/${this.state.nextUnmatchedTrainingExample}`
+                      );
+                    } else {
+                      alert('All training examples matched...');
+                    }
+                  }}
+                >
+                  START MATCHING
                 </Button>
               </div>
             </Container>

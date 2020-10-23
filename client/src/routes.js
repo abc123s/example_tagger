@@ -7,6 +7,7 @@ import Container from 'react-bootstrap/Container';
 import Navigation from './containers/Navigation';
 import Flash from './containers/Flash';
 import Tagger from './containers/Tagger';
+import Matcher from './containers/Matcher';
 import Home from './containers/Home';
 
 import './containers/App.css';
@@ -30,11 +31,12 @@ class Routes extends Component {
             )}
           />
 
-          {/* large container for ingestion tasks */}
+          {/* large container for tagging / matching tasks */}
           <Container fluid>
             <Route path="*" component={Flash} />
             <Switch>
               <Route path="/tag/:trainingExampleId" component={Tagger} />
+              <Route path="/match/:trainingExampleId" component={Matcher} />
               <Route path="/" component={Home} />
               <Redirect from="*" to="/" />
             </Switch>

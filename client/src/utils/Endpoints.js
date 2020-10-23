@@ -19,10 +19,22 @@ const endpointMap = {
       desc: `Setting tags ${data.tags} for training example ${data.id}`,
     }),
 
+    match: data => ({
+      method: 'POST',
+      endpoint: `trainingExample/match/${data.id}`,
+      desc: `Setting ingredients ${data.tags} for training example ${data.id}`,
+    }),
+
     escalate: data => ({
       method: 'POST',
       endpoint: `trainingExample/escalate/${data.id}`,
-      desc: `Escalating training example ${data.id}`,
+      desc: `Escalating training example ${data.id} (for tagging)`,
+    }),
+
+    escalateMatch: data => ({
+      method: 'POST',
+      endpoint: `trainingExample/escalateMatch/${data.id}`,
+      desc: `Escalating training example ${data.id} (for matching)`,
     }),
 
     next: data => ({
@@ -35,6 +47,12 @@ const endpointMap = {
       method: 'GET',
       endpoint: `trainingExample/nextUntagged/${data.id}`,
       desc: `Get next training example after ${data.id} that has not been tagged or escalated yet`,
+    }),
+
+    nextUnmatched: data => ({
+      method: 'GET',
+      endpoint: `trainingExample/nextUnMatched/${data.id}`,
+      desc: `Get next training example after ${data.id} that has not been matched or escalated yet`,
     }),
 
     prev: data => ({
