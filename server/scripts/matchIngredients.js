@@ -283,7 +283,8 @@ function parseQuantity(quantity) {
 function matchIngredient(taggedIngredient) {
   const ingredient = findIngredient(taggedIngredient);
 
-  const quantity = parseQuantity(taggedIngredient.qty);
+  const quantity =
+    taggedIngredient.qty === '' ? false : parseQuantity(taggedIngredient.qty);
 
   const ingredientUnit = findIngredientUnit({
     ingredient,
