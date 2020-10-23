@@ -77,10 +77,16 @@ class Ingredient extends Component {
     super(props);
     this.state = {
       // for react-select component
-      ingredientOptions: _.map(INGREDIENT_LIST, v => ({
-        value: v.id,
-        label: v.display,
-      })),
+      ingredientOptions: [
+        {
+          value: -1,
+          label: 'NO MATCH',
+        },
+        ..._.map(INGREDIENT_LIST, v => ({
+          value: v.id,
+          label: v.display,
+        })),
+      ],
     };
   }
 
@@ -119,35 +125,46 @@ class Ingredient extends Component {
       prepStrings,
     } = this.props;
 
-    const updatedIngredient = FULL_INGREDIENT_LIST[ingredient.id];
-
-    const selectedIngredient = {
-      value: updatedIngredient.id,
-      label: updatedIngredient.display,
+    let selectedIngredient = {
+      value: -1,
+      label: 'NO MATCH',
     };
-    const unitOptions = _.map(INGREDIENT_UNITS[ingredient.id], v => ({
-      value: getUnitId(v),
-      label: v.display,
-    }));
-    const selectedUnit = {
-      value: getUnitId(unit),
-      label: unit.display,
-    };
+    let unitOptions = [];
+    let selectedUnit = null;
+    let mainSpan = 'NO MATCH';
+    if (ingredient) {
+      const updatedIngredient = FULL_INGREDIENT_LIST[ingredient.id];
 
-    const availablePrepStrings = (prepStrings || []).map(this.prepConverter);
+      selectedIngredient = {
+        value: updatedIngredient.id,
+        label: updatedIngredient.display,
+      };
+      unitOptions = _.map(INGREDIENT_UNITS[ingredient.id], v => ({
+        value: getUnitId(v),
+        label: v.display,
+      }));
+      selectedUnit = {
+        value: getUnitId(unit),
+        label: unit.display,
+      };
 
-    const minimizeSpanGenerator = (s, k) => (
-      <span key={k} className="lightGray mini">
-        {s}
-      </span>
-    );
-    const mainSpan = quantity
-      ? _.flatten([
-          `${quantity} `,
-          minimizeAnnotations(unit.display, minimizeSpanGenerator, true),
-          minimizeAnnotations(updatedIngredient.display, minimizeSpanGenerator),
-        ])
-      : minimizeAnnotations(updatedIngredient.display, minimizeSpanGenerator);
+      const minimizeSpanGenerator = (s, k) => (
+        <span key={k} className="lightGray mini">
+          {s}
+        </span>
+      );
+      mainSpan = quantity
+        ? _.flatten([
+            `${quantity} `,
+            minimizeAnnotations(unit.display, minimizeSpanGenerator, true),
+            minimizeAnnotations(
+              updatedIngredient.display,
+              minimizeSpanGenerator
+            ),
+          ])
+        : minimizeAnnotations(updatedIngredient.display, minimizeSpanGenerator);
+    }
+
     const prepSpan = prep ? <span className="purple">{`${prep}`}</span> : null;
     const commentSpan = comment ? (
       <span className="success">{`${prep ? ', ' : ''}${comment}`}</span>
@@ -233,6 +250,7 @@ class Ingredient extends Component {
                         </Form.Label>
                         <button
                           className="noneIcon"
+                          disabled={!ingredient}
                           onClick={() =>
                             updateIngredient(index, 'quantity', '')
                           }
@@ -307,10 +325,6 @@ class Matcher extends Component {
       trainingExampleId: this.props.match.params.trainingExampleId,
       trainingExample: {},
       activeAccordionCard: '',
-      ingredientOptions: _.map(INGREDIENT_LIST, v => ({
-        value: v.id,
-        label: v.display,
-      })),
       completed: false,
       errors: [],
       next: null,
@@ -418,27 +432,36 @@ class Matcher extends Component {
     const errors = [...this.state.errors];
 
     if (k === 'ingredient') {
-      const newIngredient = _.find(INGREDIENT_LIST, ({ id }) => id === v);
-      let newUnit = INGREDIENT_UNITS[newIngredient.id][0];
+      if (v === -1) {
+        trainingExample.ingredients[index] = {
+          quantity: false,
+          unit: null,
+          ingredient: null,
+          prep: null,
+        };
+      } else {
+        const newIngredient = _.find(INGREDIENT_LIST, ({ id }) => id === v);
+        let newUnit = INGREDIENT_UNITS[newIngredient.id][0];
 
-      // attempt to match with previous unit
-      // only look for identical 'display' string
-      const previousUnit = _.get(trainingExample.ingredients[index], 'unit');
-      if (previousUnit) {
-        const sameDisplay = _.findIndex(
-          INGREDIENT_UNITS[newIngredient.id],
-          u => u.display === previousUnit.display
-        );
-        if (sameDisplay > -1) {
-          newUnit = INGREDIENT_UNITS[newIngredient.id][sameDisplay];
+        // attempt to match with previous unit
+        // only look for identical 'display' string
+        const previousUnit = _.get(trainingExample.ingredients[index], 'unit');
+        if (previousUnit) {
+          const sameDisplay = _.findIndex(
+            INGREDIENT_UNITS[newIngredient.id],
+            u => u.display === previousUnit.display
+          );
+          if (sameDisplay > -1) {
+            newUnit = INGREDIENT_UNITS[newIngredient.id][sameDisplay];
+          }
         }
-      }
 
-      trainingExample.ingredients[index] = {
-        ...trainingExample.ingredients[index],
-        ingredient: newIngredient,
-        unit: newUnit,
-      };
+        trainingExample.ingredients[index] = {
+          ...trainingExample.ingredients[index],
+          ingredient: newIngredient,
+          unit: newUnit,
+        };
+      }
     } else if (k === 'unit') {
       const prevIngredient = _.get(
         trainingExample.ingredients[index],
