@@ -118,6 +118,7 @@ class Ingredient extends Component {
       deleteIngredient,
       toggleCard,
       quantityError,
+      unitError,
       lockDeletionWarning,
       lockEditWarning,
       unsetDeletionWarning,
@@ -202,7 +203,7 @@ class Ingredient extends Component {
     );
 
     return (
-      <Card border={quantityError ? 'danger' : null}>
+      <Card border={quantityError || unitError ? 'danger' : null}>
         <Accordion.Toggle
           as={Card.Header}
           eventKey={index}
@@ -290,6 +291,15 @@ class Ingredient extends Component {
                       </div>
                       <Select
                         isSearchable
+                        styles={{
+                          control: (provided, state) => {
+                            const selected = state.getValue()[0].value;
+                            return {
+                              ...provided,
+                              borderColor: unitError ? '#b94a48' : '#aaa',
+                            };
+                          },
+                        }}
                         value={selectedUnit}
                         options={unitOptions}
                         onChange={({ value }) =>
@@ -326,7 +336,8 @@ class Matcher extends Component {
       trainingExample: {},
       activeAccordionCard: '',
       completed: false,
-      errors: [],
+      quantityErrors: [],
+      unitErrors: [],
       next: null,
       prev: null,
     };
@@ -391,6 +402,17 @@ class Matcher extends Component {
               ...(trainingExample.matchGuess || []),
             ],
           },
+          activeAccordionCard:
+            (trainingExample.ingredients || trainingExample.matchGuess || [])
+              .length - 1,
+          quantityErrors: _.map(
+            trainingExample.ingredients || trainingExample.matchGuess || [],
+            ({ quantity }) => !quantity && quantity !== false
+          ),
+          unitErrors: _.map(
+            trainingExample.ingredients || trainingExample.matchGuess || [],
+            ({ quantity, unit }) => !unit && quantity !== false
+          ),
           tagged: (trainingExample.tags || []).length,
           completed: (trainingExample.ingredients || []).length,
           next: _.get(next, 'id'),
@@ -421,7 +443,8 @@ class Matcher extends Component {
         ...this.state.trainingExample,
         ingredients: [...this.state.trainingExample.ingredients, newIngredient],
       },
-      errors: [...this.state.errors, false],
+      quantityErrors: [...this.state.quantityErrors, false],
+      unitErrors: [...this.state.unitErrors, false],
     });
   }
 
@@ -429,7 +452,7 @@ class Matcher extends Component {
     const trainingExample = {
       ...this.state.trainingExample,
     };
-    const errors = [...this.state.errors];
+    const quantityErrors = [...this.state.quantityErrors];
 
     if (k === 'ingredient') {
       if (v === -1) {
@@ -478,7 +501,7 @@ class Matcher extends Component {
     } else {
       // set errors as appropriate
       if (k === 'quantity') {
-        errors[index] = !(v === false || v.trim());
+        quantityErrors[index] = !(v === false || v.trim());
       }
 
       trainingExample.ingredients[index] = {
@@ -487,7 +510,7 @@ class Matcher extends Component {
       };
     }
 
-    this.setState({ trainingExample, errors });
+    this.setState({ trainingExample, quantityErrors });
   }
 
   deleteIngredient(index) {
@@ -500,36 +523,43 @@ class Matcher extends Component {
           (_, k) => k !== index
         ),
       },
-      errors: _.filter(this.state.errors, (_, k) => k !== index),
+      quantityErrors: _.filter(
+        this.state.quantityErrors,
+        (_, k) => k !== index
+      ),
+      unitErrors: _.filter(this.state.unitErrors, (_, k) => k !== index),
       activeAccordionCard: '',
     });
   }
 
   setIngredients({ ingredients: rawIngredients }) {
     const ingredients = [];
-    const errors = [];
-
+    const quantityErrors = [];
+    const unitErrors = [];
     // clean and check errors for each ingredient
     _.forEach(rawIngredients, ingredient => {
       const cleanIngredient = _.mapValues(ingredient, (v, k) =>
         CLEANING[k] ? CLEANING[k](v) : v
       );
       if (
-        _.every(
-          _.mapValues(cleanIngredient, (v, k) =>
-            VALIDATIONS[k] ? VALIDATIONS[k](v) : true
-          )
-        )
+        cleanIngredient.quantity === false ||
+        (_.isFinite(cleanIngredient.quantity) && cleanIngredient.quantity > 0)
       ) {
-        errors.push(false);
+        quantityErrors.push(false);
       } else {
-        errors.push(true);
+        quantityErrors.push(true);
+      }
+
+      if (cleanIngredient.quantity && !cleanIngredient.unit) {
+        unitErrors.push(true);
+      } else {
+        unitErrors.push(false);
       }
 
       ingredients.push(cleanIngredient);
     });
 
-    if (!_.some(errors)) {
+    if (!_.some(quantityErrors) && !_.some(unitErrors)) {
       return callEndpoint(
         {
           kind: KIND.trainingExample,
@@ -552,7 +582,7 @@ class Matcher extends Component {
         })
         .catch(() => {});
     } else {
-      this.setState({ errors });
+      this.setState({ quantityErrors, unitErrors });
     }
   }
 
@@ -743,7 +773,8 @@ class Matcher extends Component {
                           deleteIngredient={i => this.deleteIngredient(i)}
                           key={ingredient.id}
                           index={index}
-                          quantityError={this.state.errors[index]}
+                          quantityError={this.state.quantityErrors[index]}
+                          unitError={this.state.unitErrors[index]}
                           toggleCard={i => {
                             this.setState({
                               activeAccordionCard:
