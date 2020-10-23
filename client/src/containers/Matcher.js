@@ -293,7 +293,6 @@ class Ingredient extends Component {
                         isSearchable
                         styles={{
                           control: (provided, state) => {
-                            const selected = state.getValue()[0].value;
                             return {
                               ...provided,
                               borderColor: unitError ? '#b94a48' : '#aaa',
@@ -318,9 +317,6 @@ class Ingredient extends Component {
   }
 }
 
-const VALIDATIONS = {
-  quantity: v => v === false || (_.isFinite(v) && v > 0),
-};
 const CLEANING = {
   quantity: v => (v === false ? v : Number(v)),
   prep: v => (!v || v.trim() === '' ? null : v.trim()),
@@ -453,6 +449,7 @@ class Matcher extends Component {
       ...this.state.trainingExample,
     };
     const quantityErrors = [...this.state.quantityErrors];
+    const unitErrors = [...this.state.unitErrors];
 
     if (k === 'ingredient') {
       if (v === -1) {
@@ -486,6 +483,8 @@ class Matcher extends Component {
         };
       }
     } else if (k === 'unit') {
+      unitErrors[index] = !v;
+
       const prevIngredient = _.get(
         trainingExample.ingredients[index],
         'ingredient'
@@ -510,7 +509,7 @@ class Matcher extends Component {
       };
     }
 
-    this.setState({ trainingExample, quantityErrors });
+    this.setState({ trainingExample, quantityErrors, unitErrors });
   }
 
   deleteIngredient(index) {
