@@ -33,14 +33,15 @@ TrainingExample.findAll()
               loc = _.toLower(tag[0]);
               type = _.toLower(tag.slice(2));
             }
+
             // for now, only pay attention to first instance
             // of each tag type phrase
-
-            if (tokenTypeStarts[type] === 0) {
+            if (tokenTypeStarts[type] < 2) {
               if (loc === 'b') {
                 tokenTypeStarts[type] += 1;
-
-                groupedTokens[type].unshift(token);
+                if (tokenTypeStarts[type] < 2) {
+                  groupedTokens[type].unshift(token);
+                }
               } else {
                 groupedTokens[type].push(token);
               }
