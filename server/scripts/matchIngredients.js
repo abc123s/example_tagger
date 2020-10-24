@@ -23,6 +23,10 @@ function trim(string, charsToTrim = CHARS_TO_TRIM) {
 
 // TODO: take into account annotation information, or add that annotation information into a matching column
 function findIngredient({ input, name: rawTaggedName, comment }) {
+  if (!rawTaggedName) {
+    return null;
+  }
+
   let taggedName = _.toLower(rawTaggedName);
 
   // remove all errant volume and weight words
@@ -287,6 +291,14 @@ function parseQuantity(quantity) {
 // (e.g. things tagged as other before the name may be useful for identifying the unit, but not things after)
 function matchIngredient(taggedIngredient) {
   const ingredient = findIngredient(taggedIngredient);
+
+  if (!ingredient) {
+    return {
+      quantity: false,
+      unit: null,
+      ingredient: null,
+    };
+  }
 
   const quantity =
     taggedIngredient.qty === '' ? false : parseQuantity(taggedIngredient.qty);
