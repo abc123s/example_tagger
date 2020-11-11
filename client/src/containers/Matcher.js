@@ -112,7 +112,7 @@ class Ingredient extends Component {
 
   render() {
     const {
-      ingredient: { quantity, unit, ingredient, prep, comment },
+      ingredient: { quantity, unit, ingredient, prep, comment, notExact },
       index,
       updateIngredient,
       deleteIngredient,
@@ -221,6 +221,19 @@ class Ingredient extends Component {
               <Form.Group>
                 <Form.Row>
                   <Col md={12}>
+                    <Form.Check
+                      type="checkbox"
+                      id={'not-exact'}
+                      label={'Close match or substitute'}
+                      checked={notExact}
+                      onChange={event => {
+                        updateIngredient(
+                          index,
+                          'notExact',
+                          event.target.checked
+                        );
+                      }}
+                    />
                     <Select
                       isSearchable
                       autoFocus
