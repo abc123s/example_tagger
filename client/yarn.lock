@@ -8725,7 +8725,7 @@ realpath-native@^1.1.0:
 
 "recipe-display@git+ssh://git@bitbucket.org/excipient/recipe-display.git":
   version "0.0.1"
-  resolved "git+ssh://git@bitbucket.org/excipient/recipe-display.git#2c2e687098aaebf5b94d41d99b94713cbf141bba"
+  resolved "git+ssh://git@bitbucket.org/excipient/recipe-display.git#0ad1638ca12aa55047e8981ac18c9657e05b7a36"
   dependencies:
     compromise "^11.14.2"
     deep-freeze "^0.0.1"

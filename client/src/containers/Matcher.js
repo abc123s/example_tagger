@@ -19,7 +19,6 @@ import { updateFlash } from '../actions/FlashActions';
 import callEndpoint from '../utils/Endpoints';
 import { KIND, TAG } from '../utils/Constants';
 import {
-  INGREDIENT_LIST,
   FULL_INGREDIENT_LIST,
   INGREDIENT_UNITS,
 } from '../utils/IngredientDictionary';
@@ -82,7 +81,7 @@ class Ingredient extends Component {
           value: -1,
           label: 'NO MATCH',
         },
-        ..._.map(INGREDIENT_LIST, v => ({
+        ..._.map(FULL_INGREDIENT_LIST, v => ({
           value: v.id,
           label: v.display,
         })),
@@ -436,7 +435,7 @@ class Matcher extends Component {
   }
 
   addIngredient() {
-    const firstValidIngredient = _.minBy(_.values(INGREDIENT_LIST), 'id');
+    const firstValidIngredient = _.minBy(_.values(FULL_INGREDIENT_LIST), 'id');
 
     const newIngredient = {
       quantity: '1',
@@ -473,7 +472,10 @@ class Matcher extends Component {
           prep: null,
         };
       } else {
-        const newIngredient = _.find(INGREDIENT_LIST, ({ id }) => id === v);
+        const newIngredient = _.find(
+          FULL_INGREDIENT_LIST,
+          ({ id }) => id === v
+        );
         let newUnit = INGREDIENT_UNITS[newIngredient.id][0];
 
         // attempt to match with previous unit
