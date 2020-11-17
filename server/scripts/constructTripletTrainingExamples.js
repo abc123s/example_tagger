@@ -33,6 +33,12 @@ _.forEach(trainingExamplesByLabel, (examples, label) => {
   if (label !== 'null') {
     const matchedIngredient = DISPLAY_INGREDIENT[label];
 
+    // other ingredients in ingredient dictionary
+    const otherIngredients = _.chain(DISPLAY_INGREDIENT)
+      .filter(({ id }) => id !== matchedIngredient.id)
+      .map(({ id }) => id)
+      .value();
+
     // related ingredients in ingredient dictionary (based on ingredient category)
     const relatedIngredients = _.chain(DISPLAY_INGREDIENT)
       .filter(
@@ -83,6 +89,66 @@ _.forEach(trainingExamplesByLabel, (examples, label) => {
         example
       );
 
+      /**
+       * Select (example, dict, dict) style triplets
+       */
+      // select 5 random ingredients and use them as negative examples
+      const otherIngredientNegatives = _.sampleSize(otherIngredients, 5);
+      _.forEach(otherIngredientNegatives, otherIngredientId => {
+        const otherIngredient = DISPLAY_INGREDIENT[otherIngredientId];
+
+        fullIngredientPhraseTripletExamples.push([
+          fullIngredientPositive,
+          anchor,
+          otherIngredient.longNameSingular,
+        ]);
+
+        ingredientNameOnlyTripletExamples.push([
+          ingredientNameOnlyPositive,
+          anchor,
+          otherIngredient.longNameSingular,
+        ]);
+      });
+
+      // select 5 similar ingredients and use them as negative examples
+      const similiarIngredientNegatives = _.sampleSize(similarIngredients, 5);
+      _.forEach(similiarIngredientNegatives, similarIngredientId => {
+        const similarIngredient = DISPLAY_INGREDIENT[similarIngredientId];
+
+        fullIngredientPhraseTripletExamples.push([
+          fullIngredientPositive,
+          anchor,
+          similarIngredient.longNameSingular,
+        ]);
+
+        ingredientNameOnlyTripletExamples.push([
+          ingredientNameOnlyPositive,
+          anchor,
+          similarIngredient.longNameSingular,
+        ]);
+      });
+
+      // select 5 related ingredients and use them as negative examples
+      const relatedIngredientNegatives = _.sampleSize(relatedIngredients, 5);
+      _.forEach(relatedIngredientNegatives, relatedIngredientId => {
+        const relatedIngredient = DISPLAY_INGREDIENT[relatedIngredientId];
+
+        fullIngredientPhraseTripletExamples.push([
+          anchor,
+          fullIngredientPositive,
+          relatedIngredient.longNameSingular,
+        ]);
+
+        ingredientNameOnlyTripletExamples.push([
+          anchor,
+          ingredientNameOnlyPositive,
+          relatedIngredient.longNameSingular,
+        ]);
+      });
+
+      /**
+       * Select (dict, example, example) style triplets
+       */
       // select 5 random negatives
       const randomNegativeExamples = _.sampleSize(examplesWithOtherLabels, 5);
       _.forEach(randomNegativeExamples, negativeExample => {
@@ -128,24 +194,6 @@ _.forEach(trainingExamplesByLabel, (examples, label) => {
         ]);
       });
 
-      // select 5 related ingredients and use them as negative examples as well
-      const relatedIngredientNegatives = _.sampleSize(relatedIngredients, 5);
-      _.forEach(relatedIngredientNegatives, relatedIngredientId => {
-        const relatedIngredient = DISPLAY_INGREDIENT[relatedIngredientId];
-
-        fullIngredientPhraseTripletExamples.push([
-          anchor,
-          fullIngredientPositive,
-          relatedIngredient.longNameSingular,
-        ]);
-
-        ingredientNameOnlyTripletExamples.push([
-          anchor,
-          ingredientNameOnlyPositive,
-          relatedIngredient.longNameSingular,
-        ]);
-      });
-
       // select 5 negatives from examples matched to similar ingredients
       const similarNegativeExamples = _.sampleSize(
         examplesWithSimilarLabels,
@@ -170,9 +218,30 @@ _.forEach(trainingExamplesByLabel, (examples, label) => {
         ]);
       });
 
+      /**
+       * Select (dict, example, dict) style triplets
+       */
+      // select 5 random ingredients and use them as negative examples as well
+      const otherIngredientNegatives2 = _.sampleSize(otherIngredients, 5);
+      _.forEach(otherIngredientNegatives2, otherIngredientId => {
+        const otherIngredient = DISPLAY_INGREDIENT[otherIngredientId];
+
+        fullIngredientPhraseTripletExamples.push([
+          anchor,
+          fullIngredientPositive,
+          otherIngredient.longNameSingular,
+        ]);
+
+        ingredientNameOnlyTripletExamples.push([
+          anchor,
+          ingredientNameOnlyPositive,
+          otherIngredient.longNameSingular,
+        ]);
+      });
+
       // select 5 similar ingredients and use them as negative examples as well
-      const similiarIngredientNegatives = _.sampleSize(similarIngredients, 5);
-      _.forEach(similiarIngredientNegatives, similarIngredientId => {
+      const similiarIngredientNegatives2 = _.sampleSize(similarIngredients, 5);
+      _.forEach(similiarIngredientNegatives2, similarIngredientId => {
         const similarIngredient = DISPLAY_INGREDIENT[similarIngredientId];
 
         fullIngredientPhraseTripletExamples.push([
@@ -187,16 +256,34 @@ _.forEach(trainingExamplesByLabel, (examples, label) => {
           similarIngredient.longNameSingular,
         ]);
       });
+
+      // select 5 related ingredients and use them as negative examples as well
+      const relatedIngredientNegatives2 = _.sampleSize(relatedIngredients, 5);
+      _.forEach(relatedIngredientNegatives2, relatedIngredientId => {
+        const relatedIngredient = DISPLAY_INGREDIENT[relatedIngredientId];
+
+        fullIngredientPhraseTripletExamples.push([
+          anchor,
+          fullIngredientPositive,
+          relatedIngredient.longNameSingular,
+        ]);
+
+        ingredientNameOnlyTripletExamples.push([
+          anchor,
+          ingredientNameOnlyPositive,
+          relatedIngredient.longNameSingular,
+        ]);
+      });
     });
   }
 });
 
 fs.writeFileSync(
-  'fullIngredientPhraseTripletExamples.json',
+  'fullIngredientPhraseTripletExamples_v2.json',
   JSON.stringify(fullIngredientPhraseTripletExamples, null, 4)
 );
 
 fs.writeFileSync(
-  'ingredientNameOnlyTripletExamples.json',
+  'ingredientNameOnlyTripletExamples_v2.json',
   JSON.stringify(ingredientNameOnlyTripletExamples, null, 4)
 );
