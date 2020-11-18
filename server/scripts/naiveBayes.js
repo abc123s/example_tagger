@@ -1,36 +1,53 @@
 import _ from 'lodash';
-import { TrainingExample } from '../sequelize/models';
-import matchIngredients from './matchIngredients';
 
 var fs = require('fs');
 
-TrainingExample.findAll().then(trainingExamples => {
-  const matchedExamples = _.filter(
-    trainingExamples,
-    ({ ingredients }) => ingredients
-  );
+const trainExamples = JSON.parse(
+  fs.readFileSync('trainMatchedTrainingExamples.json')
+);
 
-  const cleanExamples = _.map(matchedExamples, ({ original, ingredients }) => {
-    return {
-      label:
-        (ingredients[0] &&
-          ingredients[0].ingredient &&
-          ingredients[0].ingredient.id) ||
-        -1,
-      text: original,
-    };
-  });
-
-  console.log('How many unique labels?');
-  console.log(_.maxBy(cleanExamples, ({ label }) => label));
-
-  fs.writeFile(
-    'naiveBayes.json',
-    JSON.stringify(cleanExamples, null, 2),
-    function(err) {
-      if (err) {
-        console.log(err);
-      }
-    }
-  );
+const cleanTrainExamples = _.map(trainExamples, ({ original, ingredients }) => {
+  return {
+    label:
+      (ingredients[0] &&
+        ingredients[0].ingredient &&
+        ingredients[0].ingredient.id) ||
+      -1,
+    text: original,
+  };
 });
+
+fs.writeFile(
+  'naiveBayesTrain.json',
+  JSON.stringify(cleanTrainExamples, null, 2),
+  err => {
+    if (err) {
+      console.log(err);
+    }
+  }
+);
+
+const devExamples = JSON.parse(
+  fs.readFileSync('devMatchedTrainingExamples.json')
+);
+
+const cleanDevExamples = _.map(devExamples, ({ original, ingredients }) => {
+  return {
+    label:
+      (ingredients[0] &&
+        ingredients[0].ingredient &&
+        ingredients[0].ingredient.id) ||
+      -1,
+    text: original,
+  };
+});
+
+fs.writeFile(
+  'naiveBayesDev.json',
+  JSON.stringify(cleanDevExamples, null, 2),
+  err => {
+    if (err) {
+      console.log(err);
+    }
+  }
+);
