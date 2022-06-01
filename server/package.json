@@ -21,7 +21,7 @@
     "progress": "^2.0.3",
     "prompts": "^2.1.0",
     "recipe-display": "git+ssh://git@bitbucket.org/excipient/recipe-display.git",
-    "sharp": "^0.23.2",
+    "sharp": "^0.30.5",
     "strip-bom": "^4.0.0"
   },
   "dependencies": {
